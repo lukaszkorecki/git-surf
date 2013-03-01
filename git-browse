@@ -5,20 +5,19 @@ logerr() { echo "$@" 1>&2; }
 
 # detect open-url command
 (  uname | grep Darwin >/dev/null ) && open_command='open'
-(  uname | grep Linux >/dev/null ) && open_command=xdg-open
+(  uname | grep Linux >/dev/null ) && open_command='xdg-open'
 
 if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
 fi
 
-# parse options
-# -h, -c -r
-
 REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
+FILE=""
+RANGE=""
 
-while getopts "hc:r:" OPTION; do
+while getopts "hc:R:f:r:" OPTION; do
   case "$OPTION" in
     h)
       SHOWHELP=y
@@ -28,16 +27,23 @@ while getopts "hc:r:" OPTION; do
       COMMIT="$OPTARG"
       ;;
 
-    r)
+    R)
       REMOTE="$OPTARG"
+      ;;
+    f)
+      FILE="$OPTARG"
+      ;;
+    r)
+      RANGE="$OPTARG"
       ;;
   esac
 
 done
 
-echo "WOO $SHOWHELP $COMMIT $REMOTE $*"
+# debug
+# logerr "WOO SHOWCOMMIT $SHOWHELP COMMIT $COMMIT REMOTE $REMOTE FILE $FILE RANGE $RANGE"
 
-# TODO use getops
+# TODO use getops and change this into a HEREDOC
 if [[ $SHOWHELP == 'y' ]] ; then
   echo 'git browse  to open current branch on GitHub'
   echo 'git browse <file>
@@ -88,24 +94,23 @@ getCommitUrl() {
   $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$2
 }
 
+
+parseRange() {
+  if [[ -z "$1" ]] ;then
+    echo ""
+  else
+    echo "#L$(echo "$1" | sed 's/\,/-L/')"
+  fi
+}
 # commit mode
-# TODO use getops
-if [[ SHOWCOMMIT == 'y' ]] ; then
+if [[ $SHOWCOMMIT == 'y' ]] ; then
   url=$(getCommitUrl $COMMIT)
 else
-  # detect if we passed line range
-  if [[ "$2" != "" ]] ; then
-    l1="L$2"
-  fi
-
-  if [[ "$3" != "" ]]; then
-    l2="-L$3"
-  fi
-
-  path=$(getRepoRoot "$1")
-  url="$(gitRepoUrl $REMOTE)/$path#$l1$l2"
+  range=$(parseRange $RANGE)
+  path=$(getRepoRoot $FILE)
+  url="$(gitRepoUrl $REMOTE)/$path$range"
 
 fi
 
 echo $url
-# eval "$open_command '$url'"
+eval "$open_command '$url'"
