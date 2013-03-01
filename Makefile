@@ -1,7 +1,9 @@
 NAME=git-browse
 INSTALL_PATH=/usr/local/bin/$(NAME)
 install:
-	cp $(NAME) $(INSTALL_PATH)
-	chmod +x $(INSTALL_PATH)
+	@echo "Moving $(NAME) to $(INSTALL_PATH)"
+	@cp $(NAME) $(INSTALL_PATH)
+	@chmod +x $(INSTALL_PATH)
 uninstall:
-	rm $(INSTALL_PATH)
+	@echo "Removing $(NAME) from $(INSTALL_PATH)"
+	@rm $(INSTALL_PATH)
