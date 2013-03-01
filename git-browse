@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-
+# utility / setup functions
 logerr() { echo "$@" 1>&2; }
-# FIXME this is bad pattern
+
+# detect open-url command
 (  uname | grep Darwin >/dev/null ) && open_command='open'
 (  uname | grep Linux >/dev/null ) && open_command=xdg-open
 
@@ -10,9 +11,34 @@ if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
 fi
 
+# parse options
+# -h, -c -r
+
+REMOTE=origin
+SHOWHELP=n
+SHOWCOMMIT=n
+
+while getopts "hc:r:" OPTION; do
+  case "$OPTION" in
+    h)
+      SHOWHELP=y
+      ;;
+    c)
+      SHOWCOMMIT=n
+      COMMIT="$OPTARG"
+      ;;
+
+    r)
+      REMOTE="$OPTARG"
+      ;;
+  esac
+
+done
+
+echo "WOO $SHOWHELP $COMMIT $REMOTE $*"
 
 # TODO use getops
-if [[ "$1" == '-h' ]] ; then
+if [[ $SHOWHELP == 'y' ]] ; then
   echo 'git browse  to open current branch on GitHub'
   echo 'git browse <file>
   - to open file on current branch on GitHub'
@@ -29,10 +55,13 @@ if [[ "$1" == '-h' ]] ; then
 fi
 
 
+# get current branch for given repo
 currentBranch() {
   git symbolic-ref HEAD | rev | cut -d/ -f 1 | rev
 }
 
+# parse out a path to a file and/or repo
+# first arg is the path to the file, falls back to repo root
 getRepoRoot() {
   # git rev-parse --show-toplevel
   if [[ -z "$1" || "$1" == "." ]] ; then
@@ -42,17 +71,27 @@ getRepoRoot() {
   fi
 }
 
-gitHubRepoUrl() {
-  user_and_repo_name=$(git remote -v | grep origin | head -1 | cut -f2 -d:  |cut -d' ' -f 1 | sed 's/\.git.*//')
+
+# FIXME needs to handle more
+# first arg is the remote name, falls back to 'origin'
+# origin
+#   git@github.com:lukaszkorecki/git-browse.git (fetch)
+#   ->
+#   lukaszkorecki/git-browse
+gitRepoUrl() {
+  user_and_repo_name=$(git remote -v | grep -m1 $1 |  awk '{ print $2 }' | sed 's/git.*com.//' | sed 's/\.git//')
   echo "https://github.com/$user_and_repo_name/tree/$(currentBranch)"
+}
+
+# FIXME github only
+getCommitUrl() {
+  $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$2
 }
 
 # commit mode
 # TODO use getops
-if [[ "$1" == "-c" && "$2" != "" ]] ; then
-
-  url=$(gitHubRepoUrl | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$2
-
+if [[ SHOWCOMMIT == 'y' ]] ; then
+  url=$(getCommitUrl $COMMIT)
 else
   # detect if we passed line range
   if [[ "$2" != "" ]] ; then
@@ -64,9 +103,9 @@ else
   fi
 
   path=$(getRepoRoot "$1")
-  url="$(gitHubRepoUrl)/$path#$l1$l2"
+  url="$(gitRepoUrl $REMOTE)/$path#$l1$l2"
 
 fi
 
 echo $url
-eval "$open_command '$url'"
+# eval "$open_command '$url'"
