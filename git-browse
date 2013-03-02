@@ -14,14 +14,14 @@ fi
 REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
-FILE=""
 RANGE=""
 
-while getopts "hc:R:f:r:" OPTION; do
-  case "$OPTION" in
+while getopts "hc:R:r::" OPTIONS; do
+  case "$OPTIONS" in
     h)
       SHOWHELP=y
       ;;
+
     c)
       SHOWCOMMIT=n
       COMMIT="$OPTARG"
@@ -30,33 +30,19 @@ while getopts "hc:R:f:r:" OPTION; do
     R)
       REMOTE="$OPTARG"
       ;;
-    f)
-      FILE="$OPTARG"
-      ;;
+
     r)
       RANGE="$OPTARG"
       ;;
   esac
-
 done
 
-# debug
-# logerr "WOO SHOWCOMMIT $SHOWHELP COMMIT $COMMIT REMOTE $REMOTE FILE $FILE RANGE $RANGE"
+# last unparsed arg becomes the file
+FILE=$(echo "$*" | awk '{ print $NF }')
 
 # TODO use getops and change this into a HEREDOC
 if [[ $SHOWHELP == 'y' ]] ; then
-  echo 'git browse  to open current branch on GitHub'
-  echo 'git browse <file>
-  - to open file on current branch on GitHub'
-  echo 'git browse <file> <line start><line end>
-  - to open file on current branch on GitHub and to point to a
-    given line or range of lines'
-  echo 'git browse -c <commit sha> - open given commit on github'
-  echo 'Example:'
-  echo '    git browse bins/git-browse 5 10
-                - will open https://github.com/lukaszkorecki/dotfiles/tree/master/bins/git-browse#L5-L10'
-  echo '    git browse -c $(git log --pretty=oneline | grep fix | cut -f 1 -d ' ' | head -1)
-                - opens latest commit with 'fix' in commit message'
+  echo "TODO"
   exit 0
 fi
 
@@ -80,12 +66,17 @@ getRepoRoot() {
 
 # FIXME needs to handle more
 # first arg is the remote name, falls back to 'origin'
-# origin
+# Example:
 #   git@github.com:lukaszkorecki/git-browse.git (fetch)
 #   ->
 #   lukaszkorecki/git-browse
 gitRepoUrl() {
   user_and_repo_name=$(git remote -v | grep -m1 $1 |  awk '{ print $2 }' | sed 's/git.*com.//' | sed 's/\.git//')
+  if [[ -z $user_and_repo_name ]] ; then
+    logerr "Remote named '$1' was not found!"
+    exit 1
+  fi
+
   echo "https://github.com/$user_and_repo_name/tree/$(currentBranch)"
 }
 
@@ -96,7 +87,7 @@ getCommitUrl() {
 
 
 parseRange() {
-  if [[ -z "$1" ]] ;then
+  if [[ -z "$1" ]] ; then
     echo ""
   else
     echo "#L$(echo "$1" | sed 's/\,/-L/')"
@@ -113,4 +104,6 @@ else
 fi
 
 echo $url
-eval "$open_command '$url'"
+if [[ -z $DEBUG ]] ; then
+  eval "$open_command '$url'"
+fi
