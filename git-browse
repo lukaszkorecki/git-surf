@@ -15,15 +15,17 @@ REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
 RANGE=""
+# TODO
+SHOWPULLREQUEST=n
 
-while getopts "hc:R:r::" OPTIONS; do
+while getopts "hc:R:r:p" OPTIONS; do
   case "$OPTIONS" in
     h)
       SHOWHELP=y
       ;;
 
     c)
-      SHOWCOMMIT=n
+      SHOWCOMMIT=y
       COMMIT="$OPTARG"
       ;;
 
@@ -33,6 +35,9 @@ while getopts "hc:R:r::" OPTIONS; do
 
     r)
       RANGE="$OPTARG"
+      ;;
+    p)
+      SHOWPULLREQUEST=y
       ;;
   esac
 done
@@ -82,7 +87,7 @@ gitRepoUrl() {
 
 # FIXME github only
 getCommitUrl() {
-  $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$2
+  echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
 }
 
 
