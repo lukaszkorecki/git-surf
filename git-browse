@@ -11,40 +11,6 @@ if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
 fi
 
-REMOTE=origin
-SHOWHELP=n
-SHOWCOMMIT=n
-RANGE=""
-# TODO
-SHOWPULLREQUEST=n
-
-while getopts "hc:R:r:p" OPTIONS; do
-  case "$OPTIONS" in
-    h)
-      SHOWHELP=y
-      ;;
-
-    c)
-      SHOWCOMMIT=y
-      COMMIT="$OPTARG"
-      ;;
-
-    R)
-      REMOTE="$OPTARG"
-      ;;
-
-    r)
-      RANGE="$OPTARG"
-      ;;
-    p)
-      SHOWPULLREQUEST=y
-      ;;
-  esac
-done
-
-# last unparsed arg becomes the file
-FILE=$(echo "$*" | awk '{ print $NF }')
-
 function showHelp() {
   cat <<-HELP_MSG
 Usage: `basename $0` [OPTION] [FILE or COMMIT SHA1]
@@ -66,12 +32,6 @@ Options:
 -p - opens a pull requests for current branch
 HELP_MSG
 }
-
-if [[ $SHOWHELP == 'y' ]] ; then
-	showHelp
-  exit 0
-fi
-
 
 # get current branch for given repo
 currentBranch() {
@@ -110,11 +70,16 @@ gitRepoUrl() {
 }
 
 # FIXME github only
+# turns https://github.com/a/b/tree/master into https://github.com/a/b/commit/SHA
 getCommitUrl() {
+  if [[ -z "$1" ]] ; then
+    logerr 'No commit SHA1!'
+    exit 1
+  fi
   echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
 }
 
-
+# turns 20,30 into #L20-L30
 parseRange() {
   if [[ -z "$1" ]] ; then
     echo ""
@@ -122,6 +87,47 @@ parseRange() {
     echo "#L$(echo "$1" | sed 's/\,/-L/')"
   fi
 }
+
+# Start actuall prog
+
+REMOTE=origin
+SHOWHELP=n
+SHOWCOMMIT=n
+RANGE=""
+# TODO
+SHOWPULLREQUEST=n
+
+while getopts "hc:R:r:p" OPTIONS; do
+  case "$OPTIONS" in
+    h)
+      SHOWHELP=y
+      ;;
+
+    c)
+      SHOWCOMMIT=y
+      COMMIT="$OPTARG"
+      ;;
+
+    R)
+      REMOTE="$OPTARG"
+      ;;
+
+    r)
+      RANGE="$OPTARG"
+      ;;
+    p)
+      SHOWPULLREQUEST=y
+      ;;
+  esac
+done
+
+# last unparsed arg becomes the file
+FILE=$(echo "$*" | awk '{ print $NF }')
+
+if [[ $SHOWHELP == 'y' ]] ; then
+	showHelp
+  exit 0
+fi
 # commit mode
 if [[ $SHOWCOMMIT == 'y' ]] ; then
   url=$(getCommitUrl $COMMIT)
