@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 # utility / setup functions
 logerr() { echo "$@" 1>&2; }
 
@@ -45,9 +45,30 @@ done
 # last unparsed arg becomes the file
 FILE=$(echo "$*" | awk '{ print $NF }')
 
-# TODO use getops and change this into a HEREDOC
+function showHelp() {
+  cat <<-HELP_MSG
+Usage: `basename $0` [OPTION] [FILE or COMMIT SHA1]
+Quick and dirty tool for browsing files, commits and pull requests on GitHub
+Example: git browse -r10,30 git-browse
+
+Will open default web browser pointing to the git-browse file on GitHub with
+lines 10 to 30 highlighted. If a tool like open (OSX) or xdg-open (Linux) is
+not available, the following url will be printed to STDOUT
+
+https://github.com/lukaszkorecki/git-browse/tree/master/git-browse#L10-L30
+
+Options:
+
+-r - range of lines to highlight can be single line, or a range of lines, comma
+		separated (10,30)
+-c - opens specified commit
+-R - specifies different remote than origin
+-p - opens a pull requests for current branch
+HELP_MSG
+}
+
 if [[ $SHOWHELP == 'y' ]] ; then
-  echo "TODO"
+	showHelp
   exit 0
 fi
 
