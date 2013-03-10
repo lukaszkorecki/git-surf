@@ -97,7 +97,10 @@ getRepoRoot() {
 #   ->
 #   lukaszkorecki/git-browse
 gitRepoUrl() {
-  user_and_repo_name=$(git remote -v | grep -m1 $1 |  awk '{ print $2 }' | sed 's/git.*com.//' | sed 's/\.git//')
+  remote_url=$(git remote -v | grep -m1 $1 |  awk '{ print $2 }'  )
+  # 1st sed removes git@github.com/, https://github.com/ and
+  # git@github.com:
+  user_and_repo_name=$(echo $remote_url | sed 's/.*github.com.//' | sed 's/.git$//' )
   if [[ -z $user_and_repo_name ]] ; then
     logerr "Remote named '$1' was not found!"
     exit 1
