@@ -4,8 +4,8 @@ set -e
 logerr() { echo "$@" 1>&2; }
 
 # detect open-url command
-(  uname | grep Darwin >/dev/null ) && open_command='open'
-(  uname | grep Linux >/dev/null ) && open_command='xdg-open'
+(  uname | grep Darwin >/dev/null ) && ( which open) &&  open_command='open'
+(  uname | grep Linux >/dev/null ) && (which xdg-open) && open_command='xdg-open'
 
 if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
@@ -35,7 +35,8 @@ HELP_MSG
 
 # get current branch for given repo
 currentBranch() {
-  git symbolic-ref HEAD | rev | cut -d/ -f 1 | rev
+  # whoa!
+  git rev-parse --abbrev-ref HEAD
 }
 
 # parse out a path to a file and/or repo
@@ -138,7 +139,10 @@ else
 
 fi
 
-echo $url
 if [[ -z $DEBUG ]] ; then
-  eval "$open_command '$url'"
+  if [[ -z "$open_command" ]] ; then
+    echo $url
+  else
+    eval "$open_command '$url'"
+  fi
 fi
