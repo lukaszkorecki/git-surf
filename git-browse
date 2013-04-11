@@ -80,6 +80,14 @@ getCommitUrl() {
   echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
 }
 
+getCompareURL() {
+  if [[ -z "$1" ]] ; then
+    logerr "No branch to compare!"
+    exit 1
+  fi
+  echo $(gitRepoUrl $REMOTE  | sed "s/tree\//compare\/$1\.\.\./")
+}
+
 getPullReqUrl() {
   echo $(gitRepoUrl $REMOTE | sed "s/tree/pull/")
 }
@@ -98,11 +106,13 @@ parseRange() {
 REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
+SHOWCOMPARE=n
+COMPAREBRANCH=master
 RANGE=""
 # TODO
 SHOWPULLREQUEST=n
 
-while getopts "hc:R:r:p" OPTIONS; do
+while getopts "hC:c:R:r:p" OPTIONS; do
   case "$OPTIONS" in
     h)
       SHOWHELP=y
@@ -111,6 +121,11 @@ while getopts "hc:R:r:p" OPTIONS; do
     c)
       SHOWCOMMIT=y
       COMMIT="$OPTARG"
+      ;;
+
+    C)
+      SHOWCOMPARE=y
+      COMPAREBRANCH="$OPTARG"
       ;;
 
     R)
@@ -136,6 +151,8 @@ fi
 # commit mode
 if [[ $SHOWCOMMIT == 'y' ]] ; then
   url=$(getCommitUrl $COMMIT)
+elif [[ $SHOWCOMPARE == 'y' ]] ; then
+  url=$(getCompareURL $COMPAREBRANCH)
 elif [[ $SHOWPULLREQUEST == 'y' ]] ; then
   url=$(getPullReqUrl)
 else
