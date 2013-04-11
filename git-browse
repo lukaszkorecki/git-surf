@@ -80,6 +80,10 @@ getCommitUrl() {
   echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
 }
 
+getPullReqUrl() {
+  echo $(gitRepoUrl $REMOTE | sed "s/tree/pull/")
+}
+
 # turns 20,30 into #L20-L30
 parseRange() {
   if [[ -z "$1" ]] ; then
@@ -132,6 +136,8 @@ fi
 # commit mode
 if [[ $SHOWCOMMIT == 'y' ]] ; then
   url=$(getCommitUrl $COMMIT)
+elif [[ $SHOWPULLREQUEST == 'y' ]] ; then
+  url=$(getPullReqUrl)
 else
   range=$(parseRange $RANGE)
   path=$(getRepoRoot $FILE)
