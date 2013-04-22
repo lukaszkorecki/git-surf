@@ -9,6 +9,9 @@ git-browse is a nifty little script which can open various things on GitHub:
 - `git browse -p` will open/print a GitHub url to a pull request based on current branch
 - `git browse -C <branch name>` will open/print a GitHub url showing compare view between given and current branch
 
+It uses `open` on OSX and `xdg-open` on Linux with X installed. If none of these 
+is available it will simply print the URL to STDOUT. Errors are logged to STDERR.
+
 
 install
 =======
