@@ -4,7 +4,7 @@ git-browse
 git-browse is a nifty little script which can open various things on GitHub:
 
 - `git browse` - will open/print a GitHub url for current repository and current branch
-- `git browse <path to file>` will open/print a GithHGgub url for the given file on current branch
+- `git browse <path to file>` will open/print a GithHub url for the given file on current branch
 - `git browse -c <commit sha>` will open/print a GitHub url for the given commit
 - `git browse -p` will open/print a GitHub url to a pull request based on current branch
 - `git browse -C <branch name>` will open/print a GitHub url showing compare view between given and current branch
@@ -21,8 +21,10 @@ system-wide installation
 user's location
 ---------------
 
-`make isntall INSTALL_PATH=my/.dotfiles/bin/git-browse` to install got `/my/.dotfiles/bin/git-browse` 
-Please note that `/my/.dotfiles/bin` needs to be in your PATH for git-browse to work!
+`make install INSTALL_PATH=my/.dotfiles/bin/git-browse` 
+  - will install `git-browse` to `/my/.dotfiles/bin/git-browse` 
+
+*Please note that `/my/.dotfiles/bin` needs to be in your PATH for git-browse to work!*
 
 
 requirements
@@ -43,3 +45,4 @@ licence
 =======
 
 MIT
+
