@@ -5,6 +5,7 @@ git-browse is a nifty little script which can open various things on GitHub:
 
 - `git browse` - will open/print a GitHub url for current repository and current branch
 - `git browse <path to file>` will open/print a GithHub url for the given file on current branch
+  this option also supports line ranges, for example `git browse -l10,20 README.md`
 - `git browse -c <commit sha>` will open/print a GitHub url for the given commit
 - `git browse -p` will open/print a GitHub url to a pull request based on current branch
 - `git browse -C <branch name>` will open/print a GitHub url showing compare view between given and current branch
