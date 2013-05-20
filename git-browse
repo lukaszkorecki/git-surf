@@ -4,8 +4,8 @@ set -e
 logerr() { echo "$@" 1>&2; }
 
 # detect open-url command
-(  uname | grep Darwin >/dev/null ) && open_command='open'
-(  uname | grep Linux >/dev/null ) && open_command='xdg-open'
+(  uname | grep Darwin >/dev/null ) && ( which open) &&  open_command='open'
+(  uname | grep Linux >/dev/null ) && (which xdg-open) && open_command='xdg-open'
 
 if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
@@ -35,7 +35,8 @@ HELP_MSG
 
 # get current branch for given repo
 currentBranch() {
-  git symbolic-ref HEAD | rev | cut -d/ -f 1 | rev
+  # whoa!
+  git rev-parse --abbrev-ref HEAD
 }
 
 # parse out a path to a file and/or repo
@@ -79,6 +80,18 @@ getCommitUrl() {
   echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
 }
 
+getCompareURL() {
+  if [[ -z "$1" ]] ; then
+    logerr "No branch to compare!"
+    exit 1
+  fi
+  echo $(gitRepoUrl $REMOTE  | sed "s/tree\//compare\/$1\.\.\./")
+}
+
+getPullReqUrl() {
+  echo $(gitRepoUrl $REMOTE | sed "s/tree/pull/")
+}
+
 # turns 20,30 into #L20-L30
 parseRange() {
   if [[ -z "$1" ]] ; then
@@ -93,11 +106,13 @@ parseRange() {
 REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
+SHOWCOMPARE=n
+COMPAREBRANCH=master
 RANGE=""
 # TODO
 SHOWPULLREQUEST=n
 
-while getopts "hc:R:r:p" OPTIONS; do
+while getopts "hC:c:R:r:p" OPTIONS; do
   case "$OPTIONS" in
     h)
       SHOWHELP=y
@@ -106,6 +121,11 @@ while getopts "hc:R:r:p" OPTIONS; do
     c)
       SHOWCOMMIT=y
       COMMIT="$OPTARG"
+      ;;
+
+    C)
+      SHOWCOMPARE=y
+      COMPAREBRANCH="$OPTARG"
       ;;
 
     R)
@@ -131,6 +151,10 @@ fi
 # commit mode
 if [[ $SHOWCOMMIT == 'y' ]] ; then
   url=$(getCommitUrl $COMMIT)
+elif [[ $SHOWCOMPARE == 'y' ]] ; then
+  url=$(getCompareURL $COMPAREBRANCH)
+elif [[ $SHOWPULLREQUEST == 'y' ]] ; then
+  url=$(getPullReqUrl)
 else
   range=$(parseRange $RANGE)
   path=$(getRepoRoot $FILE)
@@ -138,7 +162,10 @@ else
 
 fi
 
-echo $url
 if [[ -z $DEBUG ]] ; then
-  eval "$open_command '$url'"
+  if [[ -z "$open_command" ]] ; then
+    echo $url
+  else
+    eval "$open_command '$url'"
+  fi
 fi
