@@ -112,7 +112,7 @@ RANGE=""
 # TODO
 SHOWPULLREQUEST=n
 
-while getopts "hC:c:R:r:p" OPTIONS; do
+while getopts "hC:c:R:r:pn" OPTIONS; do
   case "$OPTIONS" in
     h)
       SHOWHELP=y
@@ -138,6 +138,9 @@ while getopts "hC:c:R:r:p" OPTIONS; do
     p)
       SHOWPULLREQUEST=y
       ;;
+    n)
+      NOOPEN=y
+      ;;
   esac
 done
 
@@ -162,10 +165,18 @@ else
 
 fi
 
+if [[ "$NOOPEN" = "y" ]] ;then
+  echo $url
+  exit 0
+fi
+
 if [[ -z $DEBUG ]] ; then
   if [[ -z "$open_command" ]] ; then
     echo $url
   else
     eval "$open_command '$url'"
   fi
+else
+  echo "Open command: $open_command"
+  echo "Url: $url"
 fi
