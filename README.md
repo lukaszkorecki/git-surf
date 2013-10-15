@@ -50,3 +50,7 @@ licence
 
 MIT
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-browse/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
