@@ -36,7 +36,14 @@ HELP_MSG
 # get current branch for given repo
 currentBranch() {
   # whoa!
+  # XXX contains quick-fix for / in branch names
+  # FIXME add proper uri encode function
   git rev-parse --abbrev-ref HEAD
+}
+
+# urlencode function taken from http://stackoverflow.com/a/17989856/130896
+urlSafeCurrentBranch() {
+  currentBranch | od -An -tx1 | tr ' ' % | xargs printf "%s"
 }
 
 # parse out a path to a file and/or repo
@@ -49,6 +56,8 @@ getRepoRoot() {
     git ls-tree $(currentBranch) --full-name $1 | awk '{ print $4 }'
   fi
 }
+
+
 
 
 # FIXME needs to handle more
@@ -67,7 +76,7 @@ gitRepoUrl() {
     exit 1
   fi
 
-  echo "https://github.com/$user_and_repo_name/tree/$(currentBranch)"
+  echo "https://github.com/$user_and_repo_name/tree/$(urlSafeCurrentBranch)"
 }
 
 # FIXME github only
