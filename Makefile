@@ -5,7 +5,7 @@ VIM_AUTOLOAD=~/.vim/autoload
 VIM_FILE=git-browse.vim
 
 test:
-	@bash git-browse-test.sh
+	@bash ./t/git-browse-test.sh
 
 install:
 	@echo "Moving $(NAME) to $(INSTALL_PATH)"

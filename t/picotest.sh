@@ -30,7 +30,8 @@ Fail() {
 # greps this file for functions prefixed with test and then
 # executes them
 Run() {
-  local tests=$(grep "^test.*\(\)" $(basename $0)  | cut -d"(" -f1)
+  local loc=$(dirname $0)/$(basename $0)
+  local tests=$(grep "^test.*\(\)" $loc  | cut -d"(" -f1)
   for t in $tests ; do
     echo ">> $t"
     $t || printf "\n"
