@@ -1,7 +1,5 @@
 #!/usr/bin/env bash -e +x
 workingDir="$( cd "$( dirname "${BASH_SOURCE[0]%}" )" && pwd )"
-echo ===============
-echo "** $workingDir"
 source $workingDir/picotest.sh
 
 
@@ -20,29 +18,28 @@ commit="1e90d9e"
 # basic url test
 testBasic() {
   local url=$(NOOPEN=y $gitBrowsePath)
-  echo ">> Test basic repository url"
+  PP "Test basic repository url"
   Check "assertEquals" "$url" "$prefix/tree/$currentBranch/"
 }
 
 testUrlencode() {
   local url=$(NOOPEN=y $gitBrowsePath -p)
-  echo ">> Test urlencoding branch name in pull request url"
+  PP "Test urlencoding branch name in pull request url"
   Check "assertEquals" "$url" "$prefix/pull/$currentUrlencodedBranch"
 }
 
 testCommitUrl() {
   local url=$(NOOPEN=y $gitBrowsePath -c $commit)
-  echo ">> Test commit url"
+  PP "Test commit url"
   Check "assertEquals" "$url" "$prefix/commit/$commit"
 }
 
 testFileUrl() {
-  local url=$(NOOPEN=y $gitBrowsePath git-browse)
-  echo ">> Test commit url"
+  local url=$(NOOPEN=y $gitBrowsePath $workingDir/../git-browse)
+  PP "Test commit url"
   Check "assertEquals" "$url" "$prefix/tree/$currentBranch/git-browse"
 }
 
 Run
 Report
-
-exit $faile
+Finish

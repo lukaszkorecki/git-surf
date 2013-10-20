@@ -26,6 +26,15 @@ Fail() {
   Failed=$(( $Failed+1))
 }
 
+Finish() {
+  exit $Failed
+}
+
+# Tiny wrapper for echo, keeps message style consistent
+PP() {
+  echo ">> $*"
+}
+
 # run all tests
 # greps this file for functions prefixed with test and then
 # executes them
@@ -33,7 +42,7 @@ Run() {
   local loc=$(dirname $0)/$(basename $0)
   local tests=$(grep "^test.*\(\)" $loc  | cut -d"(" -f1)
   for t in $tests ; do
-    echo ">> $t"
+    PP $t
     $t || printf "\n"
     TestCount=$(( $TestCount +1))
   done
@@ -47,7 +56,7 @@ Report() {
 assertEquals() {
   local s=0
   if [[ "$1" != "$2" ]] ; then
-    echo "!! $1 not equal to $2"
+    PP "!! $1 not equal to $2"
     s=1
   fi
   echo $s
@@ -62,8 +71,11 @@ assertEquals() {
 # be updated.
 Check() {
   local r=$($1 "$2" "$3" "$4" "$5")
-  [[ $r == 0 ]] && Pass
-  [[ $r != 0 ]] && Fail
+  local status=""
+  [[ $r == 0 ]] && status="Passed" && Pass
+  [[ $r != 0 ]] && status="Failed" && Fail
+  PP "  $status"
+  echo
 }
 
 
