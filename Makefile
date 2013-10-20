@@ -6,7 +6,7 @@ VIM_FILE=./extras/gitbrowse.vim
 VIM_INFO=./extras/vim.md
 
 test:
-	@time bash ./t/git-browse-test.sh
+	@bash ./t/git-browse-test.sh
 
 install:
 	@echo "Moving $(NAME) to $(INSTALL_PATH)"
