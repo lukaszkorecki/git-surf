@@ -6,11 +6,11 @@
 # 2. write some tests like so:
 #
 # testFoo() {
-#   echo "testing foo"
+#   PP "testing foo"
 #   Check "assertEquals" "foo" "foo"
 # }
 #
-# Run ; Report ; exit $Failed
+# Run ; Report ; Finish
 #
 # 3. That's it!
 
@@ -29,6 +29,8 @@ Fail() {
 Finish() {
   exit $Failed
 }
+
+## Helpers
 
 # Tiny wrapper for echo, keeps message style consistent
 PP() {
@@ -55,8 +57,10 @@ Report() {
 
 assertEquals() {
   local s=0
-  if [[ "$1" != "$2" ]] ; then
-    PP "!! $1 not equal to $2"
+  local md1=$(md5sum <(echo $1) | cut -d ' ' -f 1)
+  local md2=$(md5sum <(echo $2) | cut -d ' ' -f 1)
+  if [[ "$md1" != "$md2" ]] ; then
+    PP "!! $1 not equal to $2" 1>&2
     s=1
   fi
   echo $s
