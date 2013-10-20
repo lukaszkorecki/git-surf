@@ -1,8 +1,9 @@
 NAME=git-browse
 INSTALL_PATH=/usr/local/bin/$(NAME)
 
-VIM_AUTOLOAD=~/.vim/autoload
-VIM_FILE=git-browse.vim
+VIM_AUTOLOAD=~/.vim/autoload/
+VIM_FILE=./extras/gitbrowse.vim
+VIM_INFO=./extras/vim.md
 
 test:
 	@bash ./t/git-browse-test.sh
@@ -17,3 +18,4 @@ uninstall:
 vim:
 	@echo "Installing vim mappings to $(VIM_AUTOLOAD)"
 	@cp $(VIM_FILE) $(VIM_AUTOLOAD)
+	@cat $(VIM_INFO)
