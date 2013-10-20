@@ -42,7 +42,10 @@ currentBranch() {
 
 # urlencode function taken from http://stackoverflow.com/a/17989856/130896
 urlSafeCurrentBranch() {
-  currentBranch | od -An -tx1 | tr ' ' % | xargs printf "%s"
+  currentBranch | urlEncode
+}
+urlEncode() {
+  od -An -tx1 | tr ' ' % | xargs printf "%s"
 }
 
 # parse out a path to a file and/or repo
@@ -94,7 +97,7 @@ getCompareURL() {
     logerr "No branch to compare!"
     exit 1
   fi
-  echo $(gitRepoUrl $REMOTE  | sed "s/tree\//compare\/$1\.\.\./")
+  echo $(gitRepoUrl $REMOTE  1 | sed "s/tree\//compare\/$(echo $1 | urlEncode)\.\.\./")
 }
 
 getPullReqUrl() {
