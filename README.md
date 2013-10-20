@@ -1,6 +1,11 @@
 git-browse
 ==========
 
+[![Build Status](https://travis-ci.org/lukaszkorecki/git-browse.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-browse)
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-browse/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
+
 git-browse is a nifty little script which can open various things on GitHub:
 
 - `git browse` - will open/print a GitHub url for current repository and current branch
@@ -10,7 +15,7 @@ git-browse is a nifty little script which can open various things on GitHub:
 - `git browse -p` will open/print a GitHub url to a pull request based on current branch
 - `git browse -C <branch name>` will open/print a GitHub url showing compare view between given and current branch
 
-It uses `open` on OSX and `xdg-open` on Linux with X installed. If none of these 
+It uses `open` on OSX and `xdg-open` on Linux with X installed. If none of these
 are available it will simply print the URL to STDOUT. Errors are logged to STDERR.
 
 
@@ -25,8 +30,8 @@ system-wide installation
 user's location
 ---------------
 
-`make install INSTALL_PATH=my/.dotfiles/bin/git-browse` 
-  - will install `git-browse` to `/my/.dotfiles/bin/git-browse` 
+`make install INSTALL_PATH=my/.dotfiles/bin/git-browse`
+  - will install `git-browse` to `/my/.dotfiles/bin/git-browse`
 
 *Please note that `/my/.dotfiles/bin` needs to be in your PATH for git-browse to work!*
 
@@ -42,7 +47,7 @@ bugs
 ====
 
 
-plenty
+Some, please create issues
 
 
 licence
@@ -50,7 +55,4 @@ licence
 
 MIT
 
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-browse/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
