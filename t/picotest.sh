@@ -57,9 +57,7 @@ Report() {
 
 assertEquals() {
   local s=0
-  local md1=$(md5sum <(echo $1) | cut -d ' ' -f 1)
-  local md2=$(md5sum <(echo $2) | cut -d ' ' -f 1)
-  if [[ "$md1" != "$md2" ]] ; then
+  if [[ "$1" != "$2" ]] ; then
     PP "!! $1 not equal to $2" 1>&2
     s=1
   fi

@@ -13,7 +13,7 @@ if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
 fi
 
-function showHelp() {
+showHelp() {
   cat <<-HELP_MSG
 Usage: `basename $0` [OPTION] [FILE or COMMIT SHA1]
 Quick and dirty tool for browsing files, commits and pull requests on GitHub
@@ -76,10 +76,12 @@ gitRepoUrl() {
     exit 1
   fi
 
+  local part=$2
+  [[ -z "$part" ]] && part="tree"
   local branch=""
-  [[ -z $2 ]] && branch=$(currentBranch)
-  [[ -n $2 ]] && branch=$(urlSafeCurrentBranch)
-  echo "https://github.com/$user_and_repo_name/tree/$branch"
+  [[ -z "$3" ]] && branch=$(currentBranch)
+  [[ -n "$3" ]] && branch=$(urlSafeCurrentBranch)
+  echo "https://github.com/$user_and_repo_name/$part/$branch"
 }
 
 # FIXME github only
@@ -89,7 +91,7 @@ getCommitUrl() {
     logerr 'No commit SHA1!'
     exit 1
   fi
-  echo $(gitRepoUrl $REMOTE | sed "s/\/$(currentBranch)//" | sed "s/tree/commit/")/$1
+  echo $(gitRepoUrl $REMOTE "commit" | sed "s/$(currentBranch)/$1/")
 }
 
 getCompareURL() {
@@ -97,11 +99,13 @@ getCompareURL() {
     logerr "No branch to compare!"
     exit 1
   fi
-  echo $(gitRepoUrl $REMOTE  1 | sed "s/tree\//compare\/$(echo $1 | urlEncode)\.\.\./")
+  local compareBranch=$(gitRepoUrl $REMOTE  "compare" 1 )
+  echo "$compareBranch...$(urlSafeCurrentBranch "$1")"
+
 }
 
 getPullReqUrl() {
-  echo $(gitRepoUrl $REMOTE 1 | sed "s/tree/pull/")
+  echo $(gitRepoUrl $REMOTE "pull" 1 )
 }
 
 # turns 20,30 into #L20-L30
