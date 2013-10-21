@@ -3,7 +3,7 @@ set -e
 # utility / setup functions
 logerr() { echo "$@" 1>&2; }
 
-GIT_BROWSE_VERSION=0.3.1
+GIT_SURF_VERSION=0.4.0
 
 # detect open-url command
 (  uname | grep Darwin >/dev/null ) && ( which open 2>&1 > /dev/null ) &&  open_command='open'
@@ -15,22 +15,26 @@ fi
 
 showHelp() {
   cat <<-HELP_MSG
-Usage: `basename $0` [OPTION] [FILE or COMMIT SHA1]
+Usage:
+  git-surf [OPTION] [FILE or COMMIT SHA1]
 Quick and dirty tool for browsing files, commits and pull requests on GitHub
-Example: git browse -r10,30 git-browse
 
-Will open default web browser pointing to the git-browse file on GitHub with
+Example:
+  git surf -r2,3 Makefile
+
+Will open default web browser pointing to the git-surf file on GitHub with
 lines 10 to 30 highlighted. If a tool like open (OSX) or xdg-open (Linux) is
 not available, the following url will be printed to STDOUT
 
-https://github.com/lukaszkorecki/git-browse/tree/master/git-browse#L10-L30
+https://github.com/lukaszkorecki/git-surf/tree/master/Makefile#L2-L3
 
 Options:
 
--r - range of lines to highlight can be single line, or a range of lines, comma
+-r <START,END>- range of lines to highlight can be single line, or a range of lines, comma
 		separated (10,30)
--c - opens specified commit
--R - specifies different remote than origin
+-c <SHA1> - opens specified commit
+-C <BASE BRANCH> - compares current branch with a specific base
+-R <REMOTE> - specifies different remote than origin
 -p - opens a pull requests for current branch
 HELP_MSG
 }
@@ -48,25 +52,11 @@ urlSafeCurrentBranch() {
 # yay sed!
 urlEncode() {
   sed -e 's| |%20|g' \
-  -e 's|!|%21|g' \
-  -e 's|#|%23|g' \
-  -e 's|\$|%24|g' \
-  -e 's|%|%25|g' \
-  -e 's|&|%26|g' \
-  -e "s|'|%27|g" \
-  -e 's|(|%28|g' \
-  -e 's|)|%29|g' \
-  -e 's|*|%2A|g' \
-  -e 's|+|%2B|g' \
-  -e 's|,|%2C|g' \
-  -e 's|/|%2F|g' \
-  -e 's|:|%3A|g' \
-  -e 's|;|%3B|g' \
-  -e 's|=|%3D|g' \
-  -e 's|?|%3F|g' \
-  -e 's|@|%40|g' \
-  -e 's|\[|%5B|g' \
-  -e 's|]|%5D|g'
+  -e 's|!|%21|g' -e 's|#|%23|g'  -e 's|\$|%24|g' -e 's|%|%25|g' \
+  -e 's|&|%26|g' -e "s|'|%27|g"  -e 's|(|%28|g'  -e 's|)|%29|g' \
+  -e 's|*|%2A|g' -e 's|+|%2B|g'  -e 's|,|%2C|g'  -e 's|/|%2F|g' \
+  -e 's|:|%3A|g' -e 's|;|%3B|g'  -e 's|=|%3D|g'  -e 's|?|%3F|g' \
+  -e 's|@|%40|g' -e 's|\[|%5B|g' -e 's|]|%5D|g'
 }
 
 # parse out a path to a file and/or repo
@@ -84,9 +74,9 @@ getRepoRoot() {
 # FIXME needs to handle more
 # first arg is the remote name, falls back to 'origin'
 # Example:
-#   git@github.com:lukaszkorecki/git-browse.git (fetch)
+#   git@github.com:lukaszkorecki/git-surf.git (fetch)
 #   ->
-#   lukaszkorecki/git-browse
+#   lukaszkorecki/git-surf
 browseUrl() {
   local remote=$1
 

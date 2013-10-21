@@ -1,4 +1,4 @@
-NAME=git-browse
+NAME=git-surf
 INSTALL_PATH=/usr/local/bin/$(NAME)
 
 VIM_AUTOLOAD=~/.vim/autoload/
@@ -6,7 +6,7 @@ VIM_FILE=./extras/gitbrowse.vim
 VIM_INFO=./extras/vim.md
 
 test:
-	@bash ./t/git-browse-test.sh
+	@bash ./t/git-surf-test.sh
 
 install:
 	@echo "Moving $(NAME) to $(INSTALL_PATH)"
