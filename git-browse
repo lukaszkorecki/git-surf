@@ -87,46 +87,51 @@ getRepoRoot() {
 #   git@github.com:lukaszkorecki/git-browse.git (fetch)
 #   ->
 #   lukaszkorecki/git-browse
-gitRepoUrl() {
-  local remote_url=$(git remote -v | grep -m1 $1 |  awk '{ print $2 }'  )
+browseUrl() {
+  local remote=$1
+
+  local part=$2
+  [[ -z "$part" ]] && part="tree"
+
+  local branch=$3
+  [[ -z "$branch" ]] && branch=$(currentBranch)
+
+  local remote_url=$(git remote -v | grep -m1 $remote |  awk '{ print $2 }'  )
   # 1st sed removes git@github.com/, https://github.com/ and
   # git@github.com:
   local user_and_repo_name=$(echo $remote_url | sed -e 's/.*github.com.//' -e 's/.git$//' )
   if [[ -z $user_and_repo_name ]] ; then
-    logerr "Remote named '$1' was not found!"
+    logerr "Remote '$remote' was not found!"
     exit 1
   fi
 
-  local part=$2
-  [[ -z "$part" ]] && part="tree"
-  local branch=""
-  [[ -z "$3" ]] && branch=$(currentBranch)
-  [[ -n "$3" ]] && branch=$(urlSafeCurrentBranch)
   echo "https://github.com/$user_and_repo_name/$part/$branch"
 }
 
 # FIXME github only
 # turns https://github.com/a/b/tree/master into https://github.com/a/b/commit/SHA
 getCommitUrl() {
-  if [[ -z "$1" ]] ; then
+  local commit=$1
+  if [[ -z "$commit" ]] ; then
     logerr 'No commit SHA1!'
     exit 1
   fi
-  echo $(gitRepoUrl $REMOTE "commit" | sed "s/$(currentBranch)/$1/")
+  echo $(browseUrl $REMOTE "commit" "$commit")
 }
 
 getCompareURL() {
-  if [[ -z "$1" ]] ; then
+  local baseBranch="$1"
+  if [[ -z "$baseBranch" ]] ; then
     logerr "No branch to compare!"
     exit 1
   fi
-  local compareBranch=$(gitRepoUrl $REMOTE  "compare" 1 )
-  echo "$compareBranch...$(echo -n "$1" | urlEncode)"
+  local urlEncBaseBranch=$(echo -n "$baseBranch" | urlEncode)
+  echo "$(browseUrl $REMOTE  "compare" $urlEncBaseBranch)...$(urlSafeCurrentBranch)"
 
 }
 
 getPullReqUrl() {
-  echo $(gitRepoUrl $REMOTE "pull" 1 )
+  echo $(browseUrl  $REMOTE "pull"  "$(urlSafeCurrentBranch)")
 }
 
 # turns 20,30 into #L20-L30
@@ -198,7 +203,7 @@ elif [[ $SHOWPULLREQUEST == 'y' ]] ; then
 else
   range=$(parseRange $RANGE)
   path=$(getRepoRoot $FILE)
-  url="$(gitRepoUrl $REMOTE)/$path$range"
+  url="$(browseUrl $REMOTE)/$path$range"
 
 fi
 
