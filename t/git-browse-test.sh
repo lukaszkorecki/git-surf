@@ -53,7 +53,7 @@ testFileUrlWithLine() {
 testCompareURL() {
   local url=$(NOOPEN=y $gitBrowsePath -C test)
   PP "Open branch comparison url"
-  Check 'assertEquals' "$url" "$prefix/compare/$(echo test | urlEncode)...$currentUrlencodedBranch"
+  Check 'assertEquals' "$url" "$prefix/compare/$(currentBranch)...test"
 }
 
 Run
