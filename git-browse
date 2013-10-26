@@ -3,7 +3,8 @@ set -e
 # utility / setup functions
 logerr() { echo "$@" 1>&2; }
 
-GIT_BROWSE_VERSION=0.3.1
+_VERSION=0.3.2
+_RELEASED="Sat Oct 26 20:35:54 BST 2013"
 
 # detect open-url command
 (  uname | grep Darwin >/dev/null ) && ( which open 2>&1 > /dev/null ) &&  open_command='open'
@@ -15,24 +16,43 @@ fi
 
 showHelp() {
   cat <<-HELP_MSG
-Usage: `basename $0` [OPTION] [FILE or COMMIT SHA1]
-Quick and dirty tool for browsing files, commits and pull requests on GitHub
-Example: git browse -r10,30 git-browse
+Usage:
+  $(basename $0) [OPTION] [FILE or COMMIT SHA1]
+  Quick and tiny tool for browsing files, commits and pull requests on GitHub
 
-Will open default web browser pointing to the git-browse file on GitHub with
-lines 10 to 30 highlighted. If a tool like open (OSX) or xdg-open (Linux) is
-not available, the following url will be printed to STDOUT
+Example:
+  git browse -r10,30 git-browse
+
+  Will open default web browser pointing to the git-browse file on GitHub with
+  lines 10 to 30 highlighted. If a tool like open (OSX) or xdg-open (Linux) is
+  not available, the following url will be printed to STDOUT
 
 https://github.com/lukaszkorecki/git-browse/tree/master/git-browse#L10-L30
 
 Options:
 
 -r - range of lines to highlight can be single line, or a range of lines, comma
-		separated (10,30)
+		separated (10,30) - works only if opening a file
 -c - opens specified commit
--R - specifies different remote than origin
+-R - sets different remote than origin
 -p - opens a pull requests for current branch
+-C - opens a compare branch view on github, needs a branch name as an argument
+     defaults to master
+-v - prints version and release date
+-h - this
+
+Version:
+  $(printVersion)
+
+Website:
+
+  https://gituhb.com/lukaszkorecki/git-browse
+
 HELP_MSG
+}
+
+printVersion() {
+  echo $(basename $0) v$VERSION released $RELEASED
 }
 
 # get current branch for given repo
@@ -47,25 +67,12 @@ urlSafeCurrentBranch() {
 
 # yay sed!
 urlEncode() {
-  sed -e 's| |%20|g' \
-  -e 's|!|%21|g' \
-  -e 's|#|%23|g' \
-  -e 's|\$|%24|g' \
-  -e 's|%|%25|g' \
-  -e 's|&|%26|g' \
-  -e "s|'|%27|g" \
-  -e 's|(|%28|g' \
-  -e 's|)|%29|g' \
-  -e 's|*|%2A|g' \
-  -e 's|+|%2B|g' \
-  -e 's|,|%2C|g' \
-  -e 's|/|%2F|g' \
-  -e 's|:|%3A|g' \
-  -e 's|;|%3B|g' \
-  -e 's|=|%3D|g' \
-  -e 's|?|%3F|g' \
-  -e 's|@|%40|g' \
-  -e 's|\[|%5B|g' \
+  sed -e 's| |%20|g' \ -e 's|!|%21|g' \ -e 's|#|%23|g' \
+  -e 's|\$|%24|g' \ -e 's|%|%25|g' \ -e 's|&|%26|g' \
+  -e "s|'|%27|g" \ -e 's|(|%28|g' \ -e 's|)|%29|g' \ -e 's|*|%2A|g' \
+  -e 's|+|%2B|g' \ -e 's|,|%2C|g' \ -e 's|/|%2F|g' \
+  -e 's|:|%3A|g' \ -e 's|;|%3B|g' \ -e 's|=|%3D|g' \
+  -e 's|?|%3F|g' \ -e 's|@|%40|g' \ -e 's|\[|%5B|g' \
   -e 's|]|%5D|g'
 }
 
@@ -81,12 +88,16 @@ getRepoRoot() {
 }
 
 
-# FIXME needs to handle more
-# first arg is the remote name, falls back to 'origin'
+# FIXME needs to handle more git hosts, github is the only supported option
+
+# Arguments
+# - remote name, falls back to 'origin'
+# - the url "part" can be tree, pull, commit etc
+# - branch name, defaults to current branch
 # Example:
 #   git@github.com:lukaszkorecki/git-browse.git (fetch)
 #   ->
-#   lukaszkorecki/git-browse
+#   lukaszkorecki/git-browse/$part/$branch
 browseUrl() {
   local remote=$1
 
@@ -108,8 +119,9 @@ browseUrl() {
   echo "https://github.com/$user_and_repo_name/$part/$branch"
 }
 
-# FIXME github only
-# turns https://github.com/a/b/tree/master into https://github.com/a/b/commit/SHA
+# Arguments
+# - commit sha
+# Returns  https://github.com/a/b/commit/SHA
 getCommitUrl() {
   local commit=$1
   if [[ -z "$commit" ]] ; then
@@ -119,6 +131,10 @@ getCommitUrl() {
   echo $(browseUrl $REMOTE "commit" "$commit")
 }
 
+# Returns url for comparing current branch with one specified by user
+# Note: branch names need to be urlencoded
+# Arguments
+# - base branch name
 getCompareURL() {
   local baseBranch="$1"
   if [[ -z "$baseBranch" ]] ; then
@@ -130,6 +146,12 @@ getCompareURL() {
 
 }
 
+# Returns pull request url,
+# Note: branch name needs to be url-encoded.
+# Nice thing is that if a pull request doesn't exist, github's website
+# will show a dialog to create one, based on branch name
+# If a PR exists already github will redirect to pull request view
+# No API calls necessary
 getPullReqUrl() {
   echo $(browseUrl  $REMOTE "pull"  "$(urlSafeCurrentBranch)")
 }
@@ -144,20 +166,23 @@ parseRange() {
 }
 
 # Start actuall prog
-
 REMOTE=origin
 SHOWHELP=n
 SHOWCOMMIT=n
 SHOWCOMPARE=n
 COMPAREBRANCH=master
 RANGE=""
-# TODO
 SHOWPULLREQUEST=n
+SHOWVERSION=n
 
-while getopts "hC:c:R:r:pn" OPTIONS; do
+while getopts "vhC:c:R:r:pn" OPTIONS; do
   case "$OPTIONS" in
     h)
       SHOWHELP=y
+      ;;
+
+    v)
+      SHOWVERSION=y
       ;;
 
     c)
@@ -191,6 +216,11 @@ FILE=$(echo "$*" | awk '{ print $NF }')
 
 if [[ $SHOWHELP == 'y' ]] ; then
 	showHelp
+  exit 0
+fi
+
+if [[ $SHOWVERSION == 'y' ]] ;then
+  printVersion
   exit 0
 fi
 # commit mode
