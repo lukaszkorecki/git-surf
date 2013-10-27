@@ -1,19 +1,20 @@
 git-surf
 ==========
 
-[![Build Status](https://travis-ci.org/lukaszkorecki/git-surf.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-surf)
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-surf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Build Status](https://travis-ci.org/lukaszkorecki/git-surf.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-surf) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-surf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 
-git-surf is a nifty little script which can open various things on GitHub:
+git-surf is a nifty little script which can open various things on GitHub.
 
-- `git surf` - will open/print a GitHub url for current repository and current branch
-- `git surf <path to file>` will open/print a GithHub url for the given file on current branch
-  this option also supports line ranges, for example `git surf -l10,20 README.md`
-- `git surf -c <commit sha>` will open/print a GitHub url for the given commit
-- `git surf -p` will open/print a GitHub url to a pull request based on current branch
-- `git surf -C <branch name>` will open/print a GitHub url showing compare view between given and current branch
+* -r - range of lines to highlight can be single line, or a range of lines, comma
+       separated (10,30) - works only if opening a file
+* -c - opens specified commit
+* -R - sets different remote than origin
+* -p - opens a pull requests for current branch
+* -C - opens a compare branch view on github, needs a branch name as an argument
+*      defaults to master
+* -v - prints version and release date
+* -h - this
 
 It uses `open` on OSX and `xdg-open` on Linux with X installed. If none of these
 are available it will simply print the URL to STDOUT. Errors are logged to STDERR.

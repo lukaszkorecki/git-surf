@@ -1,4 +1,4 @@
 Add these mappings to your vimrc:
 
-    nnoremap <leader>B :call gitbrowse#GitBrowseFile()<CR>
-    vnoremap <leader>B :call gitbrowse#GitBrowseFileRange()<CR>
+    nnoremap <leader>B :call gitsurf#File()<CR>
+    vnoremap <leader>B :call gitsurf#FileRange()<CR>

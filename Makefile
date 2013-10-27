@@ -2,7 +2,7 @@ NAME=git-surf
 INSTALL_PATH=/usr/local/bin/$(NAME)
 
 VIM_AUTOLOAD=~/.vim/autoload/
-VIM_FILE=./extras/gitbrowse.vim
+VIM_FILE=./extras/gitsurf.vim
 VIM_INFO=./extras/vim.md
 
 VERSION = $(shell cat VERSION)

@@ -1,19 +1,19 @@
 " open a single line on github using git-surf
-if exists("g:loaded_git_browse") || &cp
+if exists("g:loaded_git_surf") || &cp
   "  finish
 endif
 
-let g:loaded_git_browse = 1
+let g:loaded_git_surf= 1
 
-function! gitbrowse#GitBrowseFile()
+function! gitsurf#File()
   let _line = line('v')
   let _file = expand('%')
-  exec "Git browse -r " . _line . " " . _file
+  exec "Git surf -r " . _line . " " . _file
 endf
 
 " open a range of lines on github using git-surf
-function! gitbrowse#GitBrowseFileRange() range
+function! gitsurf#FileRange() range
   let _file = expand('%')
   let _range="-r".a:firstline.",".a:lastline
-  exec "Git browse " . _range . " " . _file
+  exec "Git surf " . _range . " " . _file
 endf
