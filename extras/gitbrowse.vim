@@ -1,4 +1,4 @@
-" open a single line on github using git-browse
+" open a single line on github using git-surf
 if exists("g:loaded_git_browse") || &cp
   "  finish
 endif
@@ -11,7 +11,7 @@ function! gitbrowse#GitBrowseFile()
   exec "Git browse -r " . _line . " " . _file
 endf
 
-" open a range of lines on github using git-browse
+" open a range of lines on github using git-surf
 function! gitbrowse#GitBrowseFileRange() range
   let _file = expand('%')
   let _range="-r".a:firstline.",".a:lastline

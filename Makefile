@@ -1,4 +1,4 @@
-NAME=git-browse
+NAME=git-surf
 INSTALL_PATH=/usr/local/bin/$(NAME)
 
 VIM_AUTOLOAD=~/.vim/autoload/
@@ -9,7 +9,7 @@ VERSION = $(shell cat VERSION)
 RELEASED = $(shell date)
 
 test:
-	@bash ./t/git-browse-test.sh
+	@bash ./t/git-surf-test.sh
 
 release:
 	@echo Creating release for ${VERSION}

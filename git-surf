@@ -21,13 +21,13 @@ Usage:
   Quick and tiny tool for browsing files, commits and pull requests on GitHub
 
 Example:
-  git browse -r10,30 git-browse
+  git surf -r10,30 git-surf
 
-  Will open default web browser pointing to the git-browse file on GitHub with
+  Will open default web browser pointing to the git-surf file on GitHub with
   lines 10 to 30 highlighted. If a tool like open (OSX) or xdg-open (Linux) is
   not available, the following url will be printed to STDOUT
 
-https://github.com/lukaszkorecki/git-browse/tree/master/git-browse#L10-L30
+https://github.com/lukaszkorecki/git-surf/tree/master/git-surf#L10-L30
 
 Options:
 
@@ -46,7 +46,7 @@ Version:
 
 Website:
 
-  https://gituhb.com/lukaszkorecki/git-browse
+  https://gituhb.com/lukaszkorecki/git-surf
 
 HELP_MSG
 }
@@ -95,9 +95,9 @@ getRepoRoot() {
 # - the url "part" can be tree, pull, commit etc
 # - branch name, defaults to current branch
 # Example:
-#   git@github.com:lukaszkorecki/git-browse.git (fetch)
+#   git@github.com:lukaszkorecki/git-surf.git (fetch)
 #   ->
-#   lukaszkorecki/git-browse/$part/$branch
+#   lukaszkorecki/git-surf/$part/$branch
 browseUrl() {
   local remote=$1
 
