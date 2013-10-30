@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e +x
+#!/usr/bin/env bash
 workingDir="$( cd "$( dirname "${BASH_SOURCE[0]%}" )" && pwd )"
 source $workingDir/picotest.sh
 

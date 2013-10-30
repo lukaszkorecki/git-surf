@@ -3,12 +3,13 @@ set -e
 # utility / setup functions
 logerr() { echo "$@" 1>&2; }
 
-_VERSION=0.3.2
-_RELEASED="Sat Oct 26 20:35:54 BST 2013"
+VERSION=0.3.2
+RELEASED="Sat Oct 26 20:35:54 BST 2013"
+NAME=$(basename $0)
 
 # detect open-url command
-(  uname | grep Darwin >/dev/null ) && ( which open 2>&1 > /dev/null ) &&  open_command='open'
-(  uname | grep Linux >/dev/null ) && (which xdg-open 2>&1 > /dev/null) && open_command='xdg-open'
+(uname | grep Darwin >/dev/null) && (which open > /dev/null 2>&1 ) &&  open_command='open'
+(uname | grep Linux >/dev/null ) && (which xdg-open > /dev/null 2>&1 ) && open_command='xdg-open'
 
 if [[ -z "$open_command" ]] ; then
   logerr 'No command to open the url in the browser!'
@@ -17,7 +18,7 @@ fi
 showHelp() {
   cat <<-HELP_MSG
 Usage:
-  $(basename $0) [OPTION] [FILE or COMMIT SHA1]
+  $NAME [OPTION] [FILE or COMMIT SHA1]
   Quick and tiny tool for browsing files, commits and pull requests on GitHub
 
 Example:
@@ -52,7 +53,7 @@ HELP_MSG
 }
 
 printVersion() {
-  echo $(basename $0) v$VERSION released $RELEASED
+  echo "$NAME v$VERSION released $RELEASED"
 }
 
 # get current branch for given repo
@@ -83,7 +84,7 @@ getRepoRoot() {
   if [[ -z "$1" || "$1" == "." ]] ; then
     echo ""
   else
-    git ls-tree $(currentBranch) --full-name $1 | awk '{ print $4 }'
+    git ls-tree "$(currentBranch)" --full-name "$1" | awk '{ print $4 }'
   fi
 }
 
@@ -107,10 +108,10 @@ browseUrl() {
   local branch=$3
   [[ -z "$branch" ]] && branch=$(currentBranch)
 
-  local remote_url=$(git remote -v | grep -m1 $remote |  awk '{ print $2 }'  )
+  local remote_url=$(git remote -v | grep -m1 "$remote" |  awk '{ print $2 }'  )
   # 1st sed removes git@github.com/, https://github.com/ and
   # git@github.com:
-  local user_and_repo_name=$(echo $remote_url | sed -e 's/.*github.com.//' -e 's/.git$//' )
+  local user_and_repo_name=$(echo "$remote_url" | sed -e 's/.*github.com.//' -e 's/.git$//' )
   if [[ -z $user_and_repo_name ]] ; then
     logerr "Remote '$remote' was not found!"
     exit 1
@@ -128,7 +129,7 @@ getCommitUrl() {
     logerr 'No commit SHA1!'
     exit 1
   fi
-  echo $(browseUrl $REMOTE "commit" "$commit")
+ echo "$(browseUrl $REMOTE "commit" "$commit")"
 }
 
 # Returns url for comparing current branch with one specified by user
@@ -142,7 +143,7 @@ getCompareURL() {
     exit 1
   fi
   local urlEncBaseBranch=$(echo -n "$baseBranch" | urlEncode)
-  echo "$(browseUrl $REMOTE  "compare" $urlEncBaseBranch)...$(urlSafeCurrentBranch)"
+  echo "$(browseUrl $REMOTE  "compare" "$urlEncBaseBranch")...$(urlSafeCurrentBranch)"
 
 }
 
@@ -153,15 +154,17 @@ getCompareURL() {
 # If a PR exists already github will redirect to pull request view
 # No API calls necessary
 getPullReqUrl() {
-  echo $(browseUrl  $REMOTE "pull"  "$(urlSafeCurrentBranch)")
+  echo "$(browseUrl  $REMOTE "pull"  "$(urlSafeCurrentBranch)")"
 }
 
 # turns 20,30 into #L20-L30
 parseRange() {
+  local range="$1"
   if [[ -z "$1" ]] ; then
     echo ""
   else
-    echo "#L$(echo "$1" | sed 's/\,/-L/')"
+    # Replace , to -L
+    echo "#L${range//,/-L}"
   fi
 }
 
@@ -232,17 +235,17 @@ elif [[ $SHOWPULLREQUEST == 'y' ]] ; then
   url=$(getPullReqUrl)
 else
   range=$(parseRange $RANGE)
-  path=$(getRepoRoot $FILE)
+  path=$(getRepoRoot "$FILE")
   url="$(browseUrl $REMOTE)/$path$range"
 
 fi
 
 if [[ "$NOOPEN" = "y" ]] ;then
-  echo $url
+  echo "$url"
 else
   if [[ -z $DEBUG ]] ; then
     if [[ -z "$open_command" ]] ; then
-      echo $url
+      echo "$url"
     else
       eval "$open_command '$url'"
     fi
