@@ -109,15 +109,31 @@ browseUrl() {
   [[ -z "$branch" ]] && branch=$(currentBranch)
 
   local remote_url=$(git remote -v | grep -m1 "$remote" |  awk '{ print $2 }'  )
-  # 1st sed removes git@github.com/, https://github.com/ and
-  # git@github.com:
-  local user_and_repo_name=$(echo "$remote_url" | sed -e 's/.*github.com.//' -e 's/.git$//' )
-  if [[ -z $user_and_repo_name ]] ; then
-    logerr "Remote '$remote' was not found!"
+  if [[ $(expr index "$remote_url" github.com) ]] ; then
+    # 1st sed removes git@github.com:, https://github.com/ and
+    # git@github.com:
+    local user_and_repo_name=$(echo "$remote_url" | sed -e 's/.*github.com.//' -e 's/.git$//' )
+
+    if [[ -z $user_and_repo_name ]] ; then
+      logerr "Remote '$remote' was not found!"
+      exit 1
+    fi
+
+    echo "https://github.com/$user_and_repo_name/$part/$branch"
+  elif [[ $( expr index "$remote_url" bitbucket.org ) ]] ; then
+    echo $remote_url
+    local user_and_repo_name=$(echo $remote_url | sed -e 's/^.*bitbucket.org.//' -e 's/.git$//')
+    echo $user_and_repo_name
+    if [[ -z $user_and_repo_name ]] ; then
+      logerr "Remote '$remote' was not found!"
+      exit 1
+    fi
+
+    echo "https://bitbucket.org/$user_and_repo_name/src/$(currentCommit)"
+  else
+    logerr "Only bitbucket and github is supported"
     exit 1
   fi
-
-  echo "https://github.com/$user_and_repo_name/$part/$branch"
 }
 
 # Arguments
