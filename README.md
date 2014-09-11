@@ -1,4 +1,4 @@
-git-surf
+:surfer: git-surf
 ==========
 
 [![Build Status](https://travis-ci.org/lukaszkorecki/git-surf.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-surf) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-surf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
@@ -41,7 +41,7 @@ requirements
 ============
 
 - `bash 3+`
-- `some GNU` core utils like `cut`, `awk`, `sed` and `grep`
+- `some GNU` core utils like `awk`, `sed` and `grep`
 - `git`
 
 bugs
