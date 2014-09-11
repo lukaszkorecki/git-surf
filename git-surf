@@ -164,7 +164,7 @@ parseRange() {
     echo ""
   else
     # Replace , to -L
-    echo "#L${range//,/-L}"
+    echo "#L${range/,/-L}"
   fi
 }
 
