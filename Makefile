@@ -18,7 +18,7 @@ release:
 	@git tag v${VERSION}
 
 install:
-	@echo "Moving $(NAME) to $(INSTALL_PATH)"
+	@echo "Copying $(NAME) to $(INSTALL_PATH)"
 	@cp $(NAME) $(INSTALL_PATH)
 	@chmod +x $(INSTALL_PATH)
 uninstall:
