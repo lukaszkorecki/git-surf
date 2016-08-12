@@ -26,7 +26,7 @@ install
 system-wide installation
 ------------------------
 
-`sudo make install` to install to `/usr/local/bin/git-surf
+`sudo make install` to install to `/usr/local/bin/git-surf`
 
 user's location
 ---------------
@@ -51,7 +51,7 @@ bugs
 Some, please create issues
 
 
-licence
+license
 =======
 
 MIT
