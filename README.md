@@ -1,7 +1,7 @@
 :surfer: git-surf
 ==========
 
-[![Build Status](https://travis-ci.org/lukaszkorecki/git-surf.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-surf) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/lukaszkorecki/git-surf/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Build Status](https://travis-ci.org/lukaszkorecki/git-surf.png?branch=master)](https://travis-ci.org/lukaszkorecki/git-surf) 
 
 
 git-surf is a nifty little script which can open various things on GitHub.
